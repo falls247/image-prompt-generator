@@ -25,7 +25,7 @@ pub struct HistoryStore {
 
 impl HistoryStore {
     pub const MAX_IMAGE_BYTES: usize = 20 * 1024 * 1024;
-    const ALLOWED_EXTENSIONS: [&'static str; 4] = [".png", ".jpg", ".jpeg", ".webp"];
+    const ALLOWED_EXTENSIONS: [&'static str; 5] = [".png", ".jpg", ".jpeg", ".webp", ".gif"];
 
     pub fn new(base_dir: PathBuf, max_active_entries: usize) -> Result<Self> {
         let resolved_max = if max_active_entries == 0 {
@@ -564,7 +564,7 @@ impl HistoryStore {
                     "needs-image"
                 };
                 format!(
-                    "<section class=\"upload\" data-history-id=\"{}\"><div class=\"dropzone {}\">{}</div><input class=\"file-input\" type=\"file\" accept=\".png,.jpg,.jpeg,.webp\" /></section>",
+                    "<section class=\"upload\" data-history-id=\"{}\"><div class=\"dropzone {}\">{}</div><input class=\"file-input\" type=\"file\" accept=\".png,.jpg,.jpeg,.webp,.gif\" /></section>",
                     entry_id,
                     upload_state_class,
                     encode_text(upload_text)
@@ -665,6 +665,7 @@ fn image_content_type(path: &Path) -> &'static str {
         Some("png") => "image/png",
         Some("jpg") | Some("jpeg") => "image/jpeg",
         Some("webp") => "image/webp",
+        Some("gif") => "image/gif",
         _ => "application/octet-stream",
     }
 }
@@ -1004,14 +1005,7 @@ const INTERACTIVE_SCRIPT_TEMPLATE: &str = r#"
       });
       return parseApiResponse(res, "upload failed");
     }
-    async function copyImageToClipboard(imagePath) {
-      if (
-        !navigator.clipboard ||
-        typeof navigator.clipboard.write !== "function" ||
-        typeof ClipboardItem === "undefined"
-      ) {
-        throw new Error("このブラウザは画像コピーに対応していません");
-      }
+    async function fetchImageBlob(imagePath) {
       const imageUrl = `${API_BASE}/image?path=${encodeURIComponent(imagePath)}`;
       let res;
       try {
@@ -1029,10 +1023,55 @@ const INTERACTIVE_SCRIPT_TEMPLATE: &str = r#"
         } catch (_) {}
         throw new Error(message);
       }
-      const blob = await res.blob();
-      const blobType = blob.type && blob.type.startsWith("image/") ? blob.type : "image/png";
-      const copyBlob = blob.type === blobType ? blob : new Blob([blob], { type: blobType });
-      await navigator.clipboard.write([new ClipboardItem({ [blobType]: copyBlob })]);
+      return res.blob();
+    }
+    async function imageBlobFromApiBlob(sourceBlob) {
+      return new Promise((resolve, reject) => {
+        const objectUrl = URL.createObjectURL(sourceBlob);
+        const image = new Image();
+        image.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          const width = image.naturalWidth || image.width;
+          const height = image.naturalHeight || image.height;
+          if (!width || !height) {
+            reject(new Error("画像サイズを取得できませんでした"));
+            return;
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("画像変換に失敗しました"));
+            return;
+          }
+          ctx.drawImage(image, 0, 0);
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              reject(new Error("画像変換に失敗しました"));
+              return;
+            }
+            resolve(blob);
+          }, "image/png");
+        };
+        image.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error("画像を取得できませんでした"));
+        };
+        image.src = objectUrl;
+      });
+    }
+    async function copyImageToClipboard(imagePath) {
+      if (
+        !navigator.clipboard ||
+        typeof navigator.clipboard.write !== "function" ||
+        typeof ClipboardItem === "undefined"
+      ) {
+        throw new Error("このブラウザは画像コピーに対応していません");
+      }
+      const sourceBlob = await fetchImageBlob(imagePath);
+      const pngBlob = await imageBlobFromApiBlob(sourceBlob);
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": pngBlob })]);
     }
     function showImageCopyFeedback(button) {
       if (!button) return;
@@ -1328,10 +1367,8 @@ const NON_INTERACTIVE_SCRIPT: &str = r#"
       ) {
         throw new Error("このブラウザは画像コピーに対応していません");
       }
-      const blob = await imageBlobFromPath(imagePath);
-      const blobType = blob.type && blob.type.startsWith("image/") ? blob.type : "image/png";
-      const copyBlob = blob.type === blobType ? blob : new Blob([blob], { type: blobType });
-      await navigator.clipboard.write([new ClipboardItem({ [blobType]: copyBlob })]);
+      const pngBlob = await imageBlobFromPath(imagePath);
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": pngBlob })]);
     }
     for (const button of document.querySelectorAll(".copy-btn")) {
       button.addEventListener("click", async () => {
@@ -1367,7 +1404,7 @@ const NON_INTERACTIVE_SCRIPT: &str = r#"
 
 #[cfg(test)]
 mod tests {
-    use super::HistoryStore;
+    use super::{image_content_type, HistoryStore};
     use serde_json::Value;
     use std::fs;
     use std::path::Path;
@@ -1631,6 +1668,55 @@ mod tests {
             .update_history_prompt("missing-id", "new prompt")
             .expect("missing id should not error");
         assert!(!updated);
+
+        fs::remove_dir_all(base).ok();
+    }
+
+    #[test]
+    fn append_image_accepts_gif_extension() {
+        let base = fixture_base();
+        let mut store = HistoryStore::new(base.clone(), 2).expect("create store");
+        let entry = store.append_history("gif target").expect("append");
+
+        let image_path = store
+            .append_image(&entry.id, "sample.GIF", b"dummy")
+            .expect("append gif");
+        assert!(
+            image_path.ends_with(".gif"),
+            "saved image path should keep gif extension"
+        );
+
+        fs::remove_dir_all(base).ok();
+    }
+
+    #[test]
+    fn image_content_type_returns_gif() {
+        assert_eq!(
+            image_content_type(Path::new("images/2026/02/sample.gif")),
+            "image/gif"
+        );
+    }
+
+    #[test]
+    fn interactive_html_uses_png_clipboard_copy_and_accepts_gif_upload() {
+        let base = fixture_base();
+        let mut store = HistoryStore::new(base.clone(), 2).expect("create store");
+        let entry = store.append_history("with image slot").expect("append");
+        let entries = vec![entry];
+        let html = store.build_history_html(&entries, "Prompt History", true, true, 8765, &[]);
+
+        assert!(
+            html.contains("accept=\".png,.jpg,.jpeg,.webp,.gif\""),
+            "interactive html should accept gif uploads"
+        );
+        assert!(
+            html.contains("URL.createObjectURL(sourceBlob)"),
+            "interactive html should convert fetched blobs through canvas"
+        );
+        assert!(
+            html.contains("new ClipboardItem({ \"image/png\": pngBlob })"),
+            "interactive html should copy images as PNG"
+        );
 
         fs::remove_dir_all(base).ok();
     }
