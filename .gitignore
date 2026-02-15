@@ -6,6 +6,7 @@ Cargo.lock
 
 # Runtime generated files
 images/
+!dev/images/
 history*.json
 history*.html
 History*.json
