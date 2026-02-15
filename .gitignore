@@ -1,0 +1,42 @@
+# Build outputs
+dist/
+build/
+target/
+Cargo.lock
+
+# Runtime generated files
+images/
+history*.json
+history*.html
+History*.json
+History*.html
+
+# Caches
+.venv/
+__pycache__/
+*.pyc
+*.spec
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Logs / temp
+*.log
+*.tmp
+
+# Secrets / credentials
+.env
+.env.*
+*.pem
+*.key
+.git-credentials
+.gitcredential
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.zip

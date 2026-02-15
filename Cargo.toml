@@ -1,0 +1,39 @@
+[package]
+name = "image_prompt_generator"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "rust/src/lib.rs"
+
+[[bin]]
+name = "image_prompt_generator"
+path = "rust/src/main.rs"
+
+[dependencies]
+anyhow = "1.0"
+axum = { version = "0.8", features = ["json", "multipart", "http1"] }
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+html-escape = "0.2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.44", features = ["rt", "net", "sync", "time"] }
+toml = "0.8"
+tower-http = { version = "0.6", features = ["cors"] }
+
+[target.'cfg(windows)'.dependencies]
+clipboard-win = "5.4"
+raw-window-handle = "0.6"
+winit = "0.30"
+wry = "0.53"
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_System_LibraryLoader", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging"] }
+
+[build-dependencies]
+winres = "0.1"
+
+[profile.release]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true

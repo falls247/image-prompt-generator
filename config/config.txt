@@ -1,0 +1,388 @@
+[app]
+confirm_delete = false
+copy_debounce_sec = 2.0
+delimiter = """
+
+"""
+history_confirm_delete = true
+history_max_entries = 50
+history_server_port = 3000
+
+[[sections]]
+label = "Prompt"
+name = "prompt"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "横長",
+    "縦長",
+    "正方形",
+]
+key = "orientation"
+label = "画像の向き"
+template = "[画像の向き]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "成人男性（日本人）",
+    "成人女性（日本人）",
+    "AIロボット",
+]
+key = "subject"
+label = "被写体"
+template = "[被写体]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "作業着",
+    "制服",
+    "ビジネスカジュアル",
+    "Tシャツ、短パン、サンダル",
+]
+key = "outfit"
+label = "服装"
+template = "[服装]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "カメラ目線",
+    "本を読む",
+    "会話している",
+    "歩いている",
+]
+key = "action"
+label = "動作/関係"
+template = "[動作/関係]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "夕方",
+    "ゴールデンアワー",
+    "ブルーアワー",
+    "オフィス",
+    "都会",
+    "田舎",
+    "工場",
+    "ビーチ",
+]
+key = "setting"
+label = "設定(場所/時間/天気)"
+template = "[設定]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "白背景",
+    "黒背景",
+    "グレー背景",
+    "無地背景",
+    "ぼかし背景",
+    "スタジオ背景",
+]
+key = "background"
+label = "背景"
+template = "[背景]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "明るく爽やか",
+    "穏やか",
+    "ノスタルジック",
+    "シネマティック",
+    "ドラマチック",
+    "緊迫",
+    "ミステリアス",
+    "不穏",
+    "ダーク",
+    "ミニマル",
+    "ファンタジー",
+    "レトロ",
+    "近未来",
+    "ポップ",
+    "上品",
+    "かわいい",
+    "かっこいい",
+]
+key = "tone"
+label = "トーン"
+template = "[トーン]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "アップ",
+    "バストショット",
+    "ミディアム",
+    "フル",
+    "ロング",
+    "超ロング",
+]
+key = "shot_size"
+label = "構図(ショットサイズ)"
+template = "[構図(ショットサイズ)]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "目線",
+    "俯瞰",
+    "真俯瞰",
+    "鳥瞰",
+    "ローアングル手持ち",
+]
+key = "angle"
+label = "アングル"
+template = "[アングル]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "中央構図",
+    "対称構図",
+    "斜線構図",
+    "額縁構図",
+    "リーディングライン",
+    "前景中景遠景",
+    "ネガティブスペース",
+]
+key = "composition"
+label = "構図ルール"
+template = "[構図ルール]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "広角16-24mm風",
+    "標準35-50mm風",
+    "望遠85-135mm風",
+    "魚眼",
+]
+key = "lens_feel"
+label = "レンズ感"
+template = "[レンズ感]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "柔らかい光",
+    "硬い光",
+    "拡散光",
+    "点光源",
+]
+key = "light_quality"
+label = "照明(光の質)"
+template = "[照明(光の質)]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "順光",
+    "逆光",
+    "サイド光",
+    "トップライト",
+    "アンダーライト",
+]
+key = "light_direction"
+label = "照明(方向)"
+template = "[照明(方向)]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "レムブラントライティング",
+    "バタフライライティング",
+    "3点照明",
+    "リムライト",
+    "ゴールデンアワー光",
+    "ブルーアワー光",
+]
+key = "lighting_style"
+label = "ライティング定番"
+template = "[ライティング定番]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "深い影",
+    "柔らかい影",
+    "影を弱める",
+    "高コントラスト",
+    "低コントラスト",
+]
+key = "shadow_contrast"
+label = "影/コントラスト"
+template = "[影/コントラスト]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "中性",
+]
+key = "color_temperature"
+label = "色温度"
+template = "[色温度]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "高彩度",
+    "低彩度",
+    "パステル",
+    "モノクロ",
+    "セピア",
+    "ティール&オレンジ",
+]
+key = "color_palette"
+label = "配色/彩度"
+template = "[配色/彩度]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "映画風グレーディング",
+    "クリーングレーディング",
+    "ヴィンテージグレーディング",
+]
+key = "color_grading"
+label = "カラーグレーディング"
+template = "[カラーグレーディング]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "浅い被写界深度",
+    "深い被写界深度",
+    "ボケ",
+    "背景ぼかし",
+    "シャープフォーカス",
+]
+key = "focus_dof"
+label = "ピント/被写界深度"
+template = "[ピント/被写界深度]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "モーションブラー",
+    "手持ち感",
+    "長時間露光",
+]
+key = "motion"
+label = "動き表現"
+template = "[動き表現]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "金属光沢",
+    "マット仕上げ",
+    "光沢表面",
+    "布目",
+    "リアルな質感",
+]
+key = "texture"
+label = "質感/素材"
+template = "[質感/素材]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "写真調",
+    "3Dレンダー",
+    "アニメ調",
+    "水彩",
+    "ペン画",
+    "ドット絵",
+    "フラットデザイン",
+]
+key = "style"
+label = "スタイル"
+template = "[スタイル]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "超高精細",
+    "くっきり",
+    "背景クリーン",
+    "自然なプロポーション",
+]
+key = "quality"
+label = "品質"
+template = "[品質]：{value}"
+
+[[sections.items]]
+allow_free_text = true
+choices = [
+    "指定なし",
+    "文字なし",
+    "ロゴなし",
+    "透かしなし",
+    "余分な指なし",
+    "手の変形なし",
+    "ぼやけなし",
+    "低解像度なし",
+]
+key = "constraint"
+label = "制約"
+template = "[制約]：{value}"
+
+[state.prompt]
+action_free_text = ""
+action_selected = "会話している"
+background_free_text = ""
+background_selected = "指定なし"
+color_temperature_free_text = ""
+color_temperature_selected = "指定なし"
+constraint_free_text = ""
+constraint_selected = "指定なし"
+focus_dof_free_text = ""
+focus_dof_selected = "浅い被写界深度"
+light_direction_free_text = ""
+light_direction_selected = "指定なし"
+lighting_style_free_text = ""
+lighting_style_selected = "レムブラントライティング"
+outfit_free_text = "Tシャツ、短パン、サンダル"
+outfit_selected = "Tシャツ、短パン、サンダル"
+setting_free_text = "ビーチ"
+setting_selected = "ビーチ"
+shadow_contrast_free_text = ""
+shadow_contrast_selected = "指定なし"
+shot_size_free_text = ""
+shot_size_selected = "指定なし"
+style_free_text = ""
+style_selected = "指定なし"
+subject_free_text = ""
+subject_selected = "AIロボット"
+texture_free_text = ""
+texture_selected = "指定なし"
+
